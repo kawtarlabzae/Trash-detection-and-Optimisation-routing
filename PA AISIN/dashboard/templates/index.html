@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urban Route Intelligence · Casablanca</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+
+<!-- ── MAP ──────────────────────────────────────────────── -->
+<div id="map"></div>
+
+<!-- ── HEADER ───────────────────────────────────────────── -->
+<header id="header">
+  <div class="header-brand">
+    <svg class="brand-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="14" stroke="url(#hg)" stroke-width="1.5"/>
+      <path d="M10 22 L16 10 L22 22" stroke="url(#hg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="16" cy="16" r="2.5" fill="url(#hg)"/>
+      <defs>
+        <linearGradient id="hg" x1="0" y1="0" x2="32" y2="32">
+          <stop offset="0%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#a78bfa"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-title">Urban Route Intelligence</span>
+      <span class="brand-sub">Casablanca Field Survey · 5 Feb 2026</span>
+    </div>
+  </div>
+
+  <nav class="session-tabs" id="session-tabs">
+    <button class="tab active" data-session="all">
+      <span class="tab-dot all-dot"></span>All Routes
+    </button>
+    <button class="tab" data-session="a">
+      <span class="tab-dot" style="background:#00d4aa"></span>Route Alpha
+    </button>
+    <button class="tab" data-session="b">
+      <span class="tab-dot" style="background:#a78bfa"></span>Route Beta
+    </button>
+    <button class="tab" data-session="c">
+      <span class="tab-dot" style="background:#fbbf24"></span>Route Gamma
+    </button>
+    <button class="tab" data-session="d">
+      <span class="tab-dot" style="background:#f472b6"></span>Route Delta
+    </button>
+    <button class="tab" data-session="e">
+      <span class="tab-dot" style="background:#38bdf8"></span>Route Epsilon
+    </button>
+  </nav>
+
+  <div class="header-stats" id="header-stats">
+    <div class="hstat">
+      <span class="hstat-val" id="total-dist">—</span>
+      <span class="hstat-label">km total</span>
+    </div>
+    <div class="hsep"></div>
+    <div class="hstat">
+      <span class="hstat-val" id="total-images">—</span>
+      <span class="hstat-label">images</span>
+    </div>
+    <div class="hsep"></div>
+    <div class="hstat">
+      <span class="hstat-val" id="total-time">—</span>
+      <span class="hstat-label">minutes</span>
+    </div>
+    <div class="hsep"></div>
+    <a href="/epsilon" class="ep-nav-btn">
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+        <rect x="3" y="5" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 5V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="7" y1="9" x2="7" y2="13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="11" y1="9" x2="11" y2="13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Detect Epsilon
+    </a>
+  </div>
+</header>
+
+<!-- ── LEFT SIDEBAR ─────────────────────────────────────── -->
+<aside id="sidebar">
+  <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle panel">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="sidebar-inner">
+    <p class="sidebar-label">Routes</p>
+    <div id="session-cards"></div>
+
+    <p class="sidebar-label" style="margin-top:24px">Detection Classes</p>
+    <div class="det-legend">
+      <div class="leg-row"><span class="leg-dot" style="background:#00d4aa"></span><span>Bin</span></div>
+      <div class="leg-row"><span class="leg-dot" style="background:#fbbf24"></span><span>Garbage</span></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── DETAIL PANEL (right) ─────────────────────────────── -->
+<aside id="detail-panel" class="hidden">
+  <div class="dp-header">
+    <div class="dp-title">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1" y="3" width="13" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.4"/>
+      </svg>
+      Image Detail
+    </div>
+    <button class="icon-btn" id="close-detail">✕</button>
+  </div>
+
+  <div class="dp-img-wrap">
+    <img id="dp-img" src="" alt="Route image" />
+    <div class="dp-img-overlay">
+      <span id="dp-route-badge" class="route-badge"></span>
+    </div>
+  </div>
+
+  <div class="dp-meta">
+    <div class="meta-grid">
+      <div class="meta-cell">
+        <span class="mc-label">Latitude</span>
+        <span class="mc-val mono" id="dp-lat">—</span>
+      </div>
+      <div class="meta-cell">
+        <span class="mc-label">Longitude</span>
+        <span class="mc-val mono" id="dp-lon">—</span>
+      </div>
+      <div class="meta-cell">
+        <span class="mc-label">Speed</span>
+        <span class="mc-val" id="dp-spd">—</span>
+      </div>
+      <div class="meta-cell">
+        <span class="mc-label">Distance from start</span>
+        <span class="mc-val" id="dp-dist">—</span>
+      </div>
+    </div>
+    <div class="meta-ts" id="dp-ts">—</div>
+  </div>
+
+  <!-- Detections block (shows when data available) -->
+  <div id="dp-det-section" class="hidden">
+    <p class="dp-section-label">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M4 6.5h5M6.5 4v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Detections (RT-DETR)
+    </p>
+    <div id="dp-det-list"></div>
+  </div>
+
+  <!-- VLM description block -->
+  <div id="dp-desc-section" class="hidden">
+    <p class="dp-section-label">AI Analysis</p>
+    <p id="dp-desc-text" class="desc-text"></p>
+  </div>
+
+  <!-- Placeholder when no detection data -->
+  <div id="dp-no-det" class="no-det-placeholder">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="16" stroke="currentColor" stroke-width="1.3" stroke-dasharray="5 3"/>
+      <path d="M18 12v6M18 22h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>Awaiting RT-DETR results</span>
+    <small>Detection data will appear here once processed</small>
+  </div>
+</aside>
+
+<!-- ── SPEED CHART PANEL (bottom) ──────────────────────── -->
+<div id="chart-panel" class="hidden">
+  <div class="chart-header">
+    <span>Speed Profile <span id="chart-subtitle" class="chart-sub"></span></span>
+    <button class="icon-btn" id="close-chart">✕</button>
+  </div>
+  <canvas id="speed-chart"></canvas>
+</div>
+
+<!-- ── FLOATING CONTROLS ────────────────────────────────── -->
+<div class="fab-stack">
+  <button class="fab" id="btn-fit" title="Fit all routes to view">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button class="fab" id="btn-chart" title="Speed chart">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <polyline points="2,14 6,9 10,11 15,4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/static/js/app.js?v=2"></script>
+</body>
+</html>

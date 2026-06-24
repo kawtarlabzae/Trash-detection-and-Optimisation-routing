@@ -1,0 +1,19 @@
+[Dashboard] Loading all GPS files into merged pool ...
+ * Serving Flask app 'app'
+ * Debug mode: off
+[Dashboard]  OK Route a: 29239 pts  ts 1770276300096 ... 1770279230000
+[Dashboard]  OK Route b: 4070 pts  ts 1770279422095 ... 1770279830300
+[Dashboard]  OK Route c: 45316 pts  ts 1770283224395 ... 1770287763499
+[Dashboard]  OK Route d: 31271 pts  ts 1770288210103 ... 1770291381600
+[Dashboard]  OK Route e: 20516 pts  ts 1770294010100 ... 1770296065799
+[Dashboard] Merged GPS: 130412 pts  ts 1770276300096 ... 1770296065799
+
+[Dashboard] Route a: no 177... images matched any GPS - skipped.
+            (images span 1770269100356 ... 1770272030818, GPS pool 1770276300096 ... 1770296065799)
+[Dashboard] Route b: no 177... images matched any GPS - skipped.
+            (images span 1770272222371 ... 1770275568840, GPS pool 1770276300096 ... 1770296065799)
+[Dashboard] Route c: 5.10 km  11090 matched -> 457 markers
+[Dashboard] Route d: 0.90 km  2814 matched -> 82 markers
+[Dashboard] Route e: 3.71 km  5033 matched -> 240 markers
+
+[Dashboard] All routes ready.
